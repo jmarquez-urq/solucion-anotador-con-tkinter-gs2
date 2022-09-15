@@ -12,6 +12,8 @@ class Gui():
         self.ventana_principal.title("Anotador")
         botonAgregar=tkinter.Button(self.ventana_principal,text="Agregar nota", 
                            command = self.agregar_nota).grid(row=0, column=0)
+        botonEliminar=tkinter.Button(self.ventana_principal, text = "Eliminar",
+                command = self.eliminar_nota).grid(row=0, column=2)
         tkinter.Label(self.ventana_principal,text="Buscar").grid(row=1,column=0)
         self.cajaBuscar = tkinter.Entry(self.ventana_principal)
         self.cajaBuscar.grid(row=1, column=1)
@@ -67,6 +69,23 @@ class Gui():
         item = self.treeview.insert("", tkinter.END, text=nota.id,
                                         values=(nota.texto, nota.etiquetas))
         #print(self.treeview.set(item))
+
+    def eliminar_nota(self):
+        if not self.treeview.selection():
+            messagebox.showwarning("Sin selección",
+                "Seleccione primero la nota a eliminar")
+            return False
+        else:
+            resp = messagebox.askokcancel("Confirmar",
+                "¿Está seguro de eliminar la nota?")
+            if resp:
+                id_nota = int(self.treeview.selection()[0][1:])
+                #Intentamos eliminar la nota
+                if self.anotador.eliminar_nota(id_nota):
+                    # Si tuvimos éxito, borramos la nota también del treeview:
+                    self.treeview.delete(self.treeview.selection()[0])
+                    return True
+            return False
 
     def buscar_notas(self):
         filtro = self.cajaBuscar.get()

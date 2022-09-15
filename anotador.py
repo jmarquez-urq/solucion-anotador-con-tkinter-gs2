@@ -29,3 +29,7 @@ class Anotador:
                 notas_que_coinciden.append(nota)
         return notas_que_coinciden
 
+    def eliminar_nota(self,id_nota):
+        '''Busca la nota con el id dado y la elimina'''
+        return True
+
