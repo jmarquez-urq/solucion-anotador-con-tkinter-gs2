@@ -67,7 +67,7 @@ class Gui():
         nota = self.anotador.nueva_nota(self.texto.get(), self.etiquetas.get())
         self.modalAgregar.destroy()
         item = self.treeview.insert("", tkinter.END, text=nota.id,
-                                        values=(nota.texto, nota.etiquetas))
+                values=(nota.texto, nota.etiquetas), iid=nota.id)
         #print(self.treeview.set(item))
 
     def eliminar_nota(self):
@@ -79,7 +79,7 @@ class Gui():
             resp = messagebox.askokcancel("Confirmar",
                 "¿Está seguro de eliminar la nota?")
             if resp:
-                id_nota = int(self.treeview.selection()[0][1:])
+                id_nota = int(self.treeview.selection()[0])
                 #Intentamos eliminar la nota
                 if self.anotador.eliminar_nota(id_nota):
                     # Si tuvimos éxito, borramos la nota también del treeview:
