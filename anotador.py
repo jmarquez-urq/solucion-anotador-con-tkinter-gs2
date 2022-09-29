@@ -31,5 +31,17 @@ class Anotador:
 
     def eliminar_nota(self,id_nota):
         '''Busca la nota con el id dado y la elimina'''
-        return True
+        nota = self._buscar_por_id(id_nota)
+        if nota:
+            self.notas.remove(nota)
+            return True
+        return False
+
+    def modificar(self, id_nota, texto, etiquetas):
+        nota = self._buscar_por_id(id_nota)
+        if nota:
+            nota.texto = texto
+            nota.etiquetas = etiquetas
+            return True
+        return False
 

@@ -7,11 +7,18 @@ from tkinter import messagebox
 class Gui():
     '''Crear la pantalla inicial, mostrando todas las notas y botones'''
     def __init__(self):
-        self.ventana_principal = tkinter.Tk()
         self.anotador = Anotador()
+
+        self.ventana_principal = tkinter.Tk()
         self.ventana_principal.title("Anotador")
         botonAgregar=tkinter.Button(self.ventana_principal,text="Agregar nota", 
-                           command = self.agregar_nota).grid(row=0, column=0)
+                           command = self.agregar_nota)
+        botonAgregar.grid(row=0, column=0)
+
+        botonModificar = tkinter.Button(self.ventana_principal, 
+                text="Modificar nota", command = self.modificar_nota)
+        botonModificar.grid(row=0, column=1)
+
         botonEliminar=tkinter.Button(self.ventana_principal, text = "Eliminar",
                 command = self.eliminar_nota).grid(row=0, column=2)
         tkinter.Label(self.ventana_principal,text="Buscar").grid(row=1,column=0)
@@ -48,7 +55,7 @@ class Gui():
         self.modalAgregar = tkinter.Toplevel(self.ventana_principal)
         #top.transient(parent)
         self.modalAgregar.grab_set()
-        tkinter.Label(self.modalAgregar, text = "Nota: ").grid()
+        tkinter.Label(self.modalAgregar, text = "Nota: ").grid(row=0, column=0)
         self.texto = tkinter.Entry(self.modalAgregar)
         self.texto.grid(row=0,column=1,columnspan=2)
         self.texto.focus()
@@ -95,7 +102,54 @@ class Gui():
         else:
             messagebox.showwarning("Sin resultados",
                                 "Ninguna nota coincide con la búsqueda")
-    
+
+    def modificar_nota(self):
+        if not self.treeview.selection():
+            messagebox.showwarning("Sin selección",
+                "Seleccione primero la nota a modificar")
+            return False
+
+        item_seleccionado = self.treeview.selection()
+        id_nota = int(self.treeview.item(item_seleccionado)['text'])
+
+        nota = self.anotador._buscar_por_id(id_nota)
+        self.modalModificar = tkinter.Toplevel(self.ventana_principal)
+        self.modalModificar.grab_set()
+
+        tkinter.Label(self.modalModificar, text = "Nota: ").grid(row=0, column=0)
+        self.texto = tkinter.Entry(self.modalModificar)
+        self.texto.grid(row=0,column=1,columnspan=2)
+        self.texto.insert(0, nota.texto)
+        self.texto.focus()
+        tkinter.Label(self.modalModificar, text = "Etiquetas: ").grid(row=1)
+        self.etiquetas = tkinter.Entry(self.modalModificar)
+        self.etiquetas.grid(row=1, column=1, columnspan=2)
+        self.etiquetas.insert(0, nota.etiquetas)
+
+        botonOK = tkinter.Button(self.modalModificar, text="Guardar",
+                command=self.modificar_ok)
+        self.modalModificar.bind("<Return>", self.modificar_ok)
+        botonOK.grid(row=2)
+        botonCancelar = tkinter.Button(self.modalModificar, text = "Cancelar",
+                command = self.modalModificar.destroy)
+        botonCancelar.grid(row=2,column=2)
+
+    def modificar_ok(self):
+        item_seleccionado = self.treeview.selection()
+        id_nota = int(self.treeview.item(item_seleccionado)['text'])
+
+        resultado = self.anotador.modificar(id_nota, self.texto.get(),
+                self.etiquetas.get())
+
+        if resultado:
+            self.treeview.set(self.treeview.selection()[0], column="texto",
+                    value=self.texto.get())
+            self.treeview.set(self.treeview.selection()[0], column="etiquetas",
+                    value=self.etiquetas.get())
+            self.modalModificar.destroy()
+        else:
+            messagebox.showwarning("Error", "Error al modificar la nota")
+
 if __name__ == "__main__":
     gui = Gui()
     gui.ventana_principal.mainloop()
